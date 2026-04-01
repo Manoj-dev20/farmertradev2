@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FairTrade Intelligence — BGS Hackathon</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --ink: #0b0f0a;
+  --deep: #111710;
+  --panel: #161d14;
+  --surface: #1e271b;
+  --rim: #2a3826;
+  --muted: rgba(200,220,190,0.12);
+  --fog: rgba(180,210,160,0.07);
+  --gold: #c8943a;
+  --amber: #e0b050;
+  --leaf: #5aaa50;
+  --sprout: #7acc6e;
+  --sky: #6ab4d8;
+  --alert: #e05252;
+  --warn: #e08040;
+  --cream: #e8f0e0;
+  --dim: rgba(232,240,224,0.45);
+  --dimmer: rgba(232,240,224,0.25);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* grain */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:9999; opacity:.5;
+}
+
+/* ─── HEADER ─── */
+header {
+  position:sticky; top:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 36px;
+  background:rgba(11,15,10,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--rim);
+}
+
+.logo {
+  display:flex; align-items:center; gap:12px;
+}
+
+.logo-mark {
+  width:38px; height:38px;
+  background:linear-gradient(135deg,var(--gold),var(--amber));
+  border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
+  box-shadow:0 4px 18px rgba(200,148,58,0.3);
+  flex-shrink:0;
+}
+
+.logo-name {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:1.1rem;
+  letter-spacing:-.02em;
+  background:linear-gradient(90deg,var(--amber),var(--cream));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.logo-tag {
+  font-size:.6rem;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+}
+
+.header-right {
+  display:flex; align-items:center; gap:14px;
+}
+
+.live-pill {
+  display:flex; align-items:center; gap:7px;
+  padding:5px 14px;
+  border:1px solid rgba(90,170,80,.3);
+  border-radius:30px;
+  font-size:.65rem;
+  letter-spacing:.1em;
+  color:var(--sprout);
+  background:rgba(90,170,80,.06);
+  font-family:'JetBrains Mono',monospace;
+}
+
+.live-dot {
+  width:6px; height:6px;
+  background:var(--sprout);
+  border-radius:50%;
+  animation:blink 2s ease infinite;
+}
+
+@keyframes blink {
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.4;transform:scale(.7)}
+}
+
+/* ─── NAV TABS ─── */
+.nav-tabs {
+  display:flex; gap:0;
+  border-bottom:1px solid var(--rim);
+  background:var(--deep);
+  padding:0 36px;
+}
+
+.nav-tab {
+  padding:12px 20px;
+  font-size:.72rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--dimmer);
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+  user-select:none;
+}
+
+.nav-tab.active { color:var(--amber); border-bottom-color:var(--amber); }
+.nav-tab:hover:not(.active) { color:var(--dim); }
+
+/* ─── MAIN LAYOUT ─── */
+.app {
+  max-width:1200px;
+  margin:0 auto;
+  padding:32px 36px 80px;
+}
+
+/* ─── PAGE SECTIONS ─── */
+.page { display:none; }
+.page.active { display:block; }
+
+/* ─── SECTION HEADER ─── */
+.sect-head {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:24px;
+}
+
+.sect-head-line {
+  flex:1; height:1px;
+  background:var(--rim);
+}
+
+.sect-label {
+  font-size:.6rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-family:'JetBrains Mono',monospace;
+  white-space:nowrap;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background:var(--panel);
+  border:1px solid var(--rim);
+  border-radius:14px;
+  padding:22px;
+}
+
+.card-title {
+  font-size:.58rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-family:'JetBrains Mono',monospace;
+  margin-bottom:16px;
+  display:flex; align-items:center; gap:8px;
+}
+
+/* ─── FORM ELEMENTS ─── */
+.form-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.form-group {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.form-group.full { grid-column:1/-1; }
+
+label {
+  font-size:.6rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+}
+
+label .req { color:var(--gold); margin-left:3px; }
+
+input, select, textarea {
+  background:var(--surface);
+  border:1px solid var(--rim);
+  border-radius:9px;
+  padding:11px 14px;
+  color:var(--cream);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.82rem;
+  outline:none;
+  transition:all .2s;
+  width:100%;
+  -webkit-appearance:none;
+}
+
+input:focus, select:focus {
+  border-color:var(--gold);
+  background:rgba(200,148,58,.06);
+  box-shadow:0 0 0 3px rgba(200,148,58,.1);
+}
+
+input::placeholder { color:var(--dimmer); }
+input[readonly], input[disabled] { opacity:.65; cursor:not-allowed; }
+
+select option { background:var(--panel); }
+
+.hint {
+  font-size:.6rem;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.03em;
+}
+
+/* ─── FARMER AUTOFILL CARD ─── */
+.autofill-display {
+  display:none;
+  background:var(--surface);
+  border:1px solid rgba(90,170,80,.25);
+  border-radius:10px;
+  padding:14px 18px;
+  gap:12px;
+  margin-top:8px;
+}
+
+.autofill-display.visible { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; }
+
+.autofill-field {}
+.autofill-key {
+  font-size:.55rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+  margin-bottom:3px;
+}
+
+.autofill-val {
+  font-size:.82rem;
+  font-family:'Syne',sans-serif;
+  font-weight:600;
+  color:var(--sprout);
+}
+
+/* ─── BUYER DROPDOWN ─── */
+.buyer-select-wrap {
+  position:relative;
+}
+
+.buyer-reputation {
+  display:flex; align-items:center; gap:8px;
+  margin-top:8px;
+  padding:9px 14px;
+  background:var(--surface);
+  border:1px solid var(--rim);
+  border-radius:8px;
+  font-size:.72rem;
+  display:none;
+}
+
+.buyer-reputation.visible { display:flex; }
+
+.rep-bar-wrap {
+  flex:1; height:4px;
+  background:var(--rim);
+  border-radius:2px;
+  overflow:hidden;
+}
+
+.rep-bar-fill { height:100%; border-radius:2px; transition:width .5s ease; }
+
+.rep-score-text {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.7rem;
+  white-space:nowrap;
+}
+
+/* ─── GROUP CREATION UI ─── */
+.mode-toggle {
+  display:flex; gap:0;
+  border:1px solid var(--rim);
+  border-radius:9px;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+
+.mode-btn {
+  flex:1;
+  padding:10px;
+  text-align:center;
+  font-size:.65rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+  cursor:pointer;
+  transition:all .2s;
+  color:var(--dimmer);
+  background:transparent;
+  border:none;
+  user-select:none;
+}
+
+.mode-btn.active {
+  background:rgba(200,148,58,.15);
+  color:var(--amber);
+}
+
+.group-panel {
+  display:none;
+}
+
+.group-panel.active { display:block; }
+
+.farmer-search-input {
+  margin-bottom:12px;
+}
+
+.farmer-pool {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:200px;
+  overflow-y:auto;
+  margin-bottom:14px;
+}
+
+.farmer-pool-item {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 14px;
+  background:var(--surface);
+  border:1px solid var(--rim);
+  border-radius:8px;
+  font-size:.78rem;
+  cursor:pointer;
+  transition:all .2s;
+}
+
+.farmer-pool-item:hover { border-color:var(--gold); background:rgba(200,148,58,.06); }
+.farmer-pool-item.selected { border-color:var(--sprout); background:rgba(90,170,80,.08); }
+
+.farmer-pool-info {
+  display:flex; align-items:center; gap:10px;
+}
+
+.farmer-pool-id {
+  font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;
+  color:var(--gold);
+  background:rgba(200,148,58,.1);
+  padding:2px 7px;
+  border-radius:4px;
+}
+
+.farmer-pool-name { font-weight:600; font-size:.8rem; }
+.farmer-pool-meta { font-size:.65rem; color:var(--dimmer); }
+
+.add-btn {
+  padding:4px 12px;
+  border:1px solid var(--rim);
+  border-radius:6px;
+  font-size:.62rem;
+  cursor:pointer;
+  background:transparent;
+  color:var(--cream);
+  font-family:'JetBrains Mono',monospace;
+  transition:all .2s;
+  white-space:nowrap;
+}
+
+.add-btn:hover { border-color:var(--sprout); color:var(--sprout); }
+.add-btn.remove { border-color:rgba(224,82,82,.3); color:var(--alert); }
+.add-btn.remove:hover { border-color:var(--alert); background:rgba(224,82,82,.06); }
+
+.selected-group-panel {
+  background:var(--surface);
+  border:1px solid rgba(90,170,80,.2);
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.selected-group-title {
+  font-size:.58rem;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--sprout);
+  font-family:'JetBrains Mono',monospace;
+  margin-bottom:10px;
+}
+
+.selected-group-members {
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-bottom:10px;
+}
+
+.member-chip {
+  display:flex; align-items:center; gap:6px;
+  padding:4px 10px;
+  background:rgba(90,170,80,.1);
+  border:1px solid rgba(90,170,80,.25);
+  border-radius:20px;
+  font-size:.65rem;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.chip-remove {
+  cursor:pointer;
+  color:var(--dimmer);
+  font-size:.7rem;
+  line-height:1;
+  transition:color .2s;
+}
+.chip-remove:hover { color:var(--alert); }
+
+.group-stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+.group-stat {
+  text-align:center;
+  padding:8px;
+  background:rgba(200,148,58,.06);
+  border-radius:7px;
+  border:1px solid rgba(200,148,58,.12);
+}
+
+.group-stat-val {
+  font-family:'Syne',sans-serif;
+  font-size:.95rem;
+  font-weight:700;
+  color:var(--amber);
+}
+
+.group-stat-key {
+  font-size:.55rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* ─── SUBMIT BUTTON ─── */
+.submit-btn {
+  width:100%;
+  padding:16px;
+  background:linear-gradient(135deg,var(--gold),var(--amber));
+  border:none;
+  border-radius:10px;
+  color:var(--ink);
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:.95rem;
+  letter-spacing:.04em;
+  cursor:pointer;
+  transition:all .3s;
+  position:relative;
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.submit-btn::after {
+  content:'';
+  position:absolute;
+  top:0; left:-100%;
+  width:100%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  transition:left .5s;
+}
+
+.submit-btn:hover::after { left:100%; }
+.submit-btn:hover { box-shadow:0 8px 28px rgba(200,148,58,.4); transform:translateY(-2px); }
+.submit-btn:active { transform:translateY(0); }
+.submit-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* ─── LOADING ─── */
+.loading-overlay {
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(11,15,10,.88);
+  z-index:500;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:20px;
+}
+
+.loading-overlay.active { display:flex; }
+
+.loader-dots {
+  display:flex; gap:8px; align-items:center;
+}
+
+.loader-dot {
+  width:10px; height:10px;
+  border-radius:50%;
+  background:rgba(200,148,58,.25);
+  animation:wave 1.4s ease-in-out infinite;
+}
+
+.loader-dot:nth-child(1) { animation-delay:0s; }
+.loader-dot:nth-child(2) { animation-delay:.18s; }
+.loader-dot:nth-child(3) { animation-delay:.36s; }
+.loader-dot:nth-child(4) { animation-delay:.54s; }
+.loader-dot:nth-child(5) { animation-delay:.72s; }
+
+@keyframes wave {
+  0%,80%,100%{background:rgba(200,148,58,.2);transform:scale(1)}
+  40%{background:var(--amber);transform:scale(1.55)}
+}
+
+.loading-text {
+  font-family:'Syne',sans-serif;
+  font-size:1rem;
+  color:var(--amber);
+}
+
+.loading-sub {
+  font-size:.68rem;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.08em;
+}
+
+/* ─── ERROR ─── */
+.error-box {
+  display:none;
+  margin-top:14px;
+  padding:16px 20px;
+  background:rgba(224,82,82,.07);
+  border:1px solid rgba(224,82,82,.3);
+  border-radius:10px;
+  color:var(--alert);
+  font-size:.8rem;
+  line-height:1.6;
+}
+
+.error-box.show { display:block; }
+
+/* ─── RESULT PANEL ─── */
+#result-panel { display:none; margin-top:40px; animation:slideUp .4s ease; }
+@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── DECISION BANNER ─── */
+.decision-banner {
+  border-radius:14px;
+  padding:28px 32px;
+  margin-bottom:20px;
+  display:flex;
+  align-items:flex-start;
+  gap:20px;
+  position:relative;
+  overflow:hidden;
+}
+
+.decision-banner.accept {
+  background:linear-gradient(135deg,rgba(90,170,80,.1),rgba(90,170,80,.05));
+  border:1px solid rgba(90,170,80,.3);
+}
+
+.decision-banner.negotiate {
+  background:linear-gradient(135deg,rgba(224,128,64,.1),rgba(224,128,64,.05));
+  border:1px solid rgba(224,128,64,.3);
+}
+
+.decision-banner.reject {
+  background:linear-gradient(135deg,rgba(224,82,82,.1),rgba(224,82,82,.05));
+  border:1px solid rgba(224,82,82,.3);
+}
+
+.decision-emoji { font-size:2.8rem; flex-shrink:0; line-height:1; }
+
+.decision-verdict {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:1.4rem;
+  letter-spacing:-.02em;
+  margin-bottom:5px;
+}
+
+.decision-headline { font-size:.85rem; color:var(--dim); line-height:1.6; margin-bottom:10px; }
+
+.decision-tx {
+  font-size:.6rem;
+  letter-spacing:.1em;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+}
+
+.risk-row {
+  display:flex; align-items:center; gap:12px;
+  margin-top:14px;
+}
+
+.risk-label {
+  font-size:.6rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+  white-space:nowrap;
+}
+
+.risk-track {
+  flex:1; height:5px;
+  background:var(--rim);
+  border-radius:3px;
+  overflow:hidden;
+}
+
+.risk-fill { height:100%; border-radius:3px; transition:width 1s ease; }
+.risk-num { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; }
+
+/* ─── RESULT GRID ─── */
+.result-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:14px;
+}
+
+@media(max-width:700px) { .result-grid { grid-template-columns:1fr; } .form-grid { grid-template-columns:1fr; } .autofill-display.visible { grid-template-columns:1fr 1fr; } }
+
+/* ─── METRIC ROWS ─── */
+.metric-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:.8rem;
+}
+.metric-row:last-child { border-bottom:none; }
+.metric-key { color:var(--dimmer); font-size:.7rem; }
+.metric-val { font-family:'Syne',sans-serif; font-weight:600; font-size:.84rem; }
+
+/* ─── PRICE BARS ─── */
+.price-bar-section {
+  display:flex;
+  gap:10px;
+  align-items:flex-end;
+  margin-bottom:14px;
+  height:80px;
+}
+
+.price-bar-wrap {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  height:100%;
+}
+
+.price-bar-outer {
+  flex:1; width:100%;
+  background:var(--rim);
+  border-radius:5px;
+  overflow:hidden;
+  display:flex;
+  align-items:flex-end;
+}
+
+.price-bar-inner {
+  width:100%;
+  border-radius:5px;
+  transition:height 1s ease;
+}
+
+.price-bar-value {
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:.8rem;
+}
+
+.price-bar-label {
+  font-size:.55rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* ─── FLAG LIST ─── */
+.flag-list { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+.flag-item {
+  display:flex; align-items:flex-start; gap:8px;
+  padding:8px 12px;
+  background:rgba(224,82,82,.05);
+  border:1px solid rgba(224,82,82,.18);
+  border-radius:7px;
+  font-size:.72rem;
+  color:rgba(232,240,224,.7);
+  line-height:1.5;
+}
+
+/* ─── ACTION PLAN ─── */
+.action-list { display:flex; flex-direction:column; gap:8px; }
+.action-item {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 14px;
+  background:rgba(200,148,58,.05);
+  border:1px solid rgba(200,148,58,.15);
+  border-radius:9px;
+  transition:all .2s;
+}
+
+.action-item:hover { background:rgba(200,148,58,.1); border-color:rgba(200,148,58,.3); }
+
+.action-num {
+  width:22px; height:22px; flex-shrink:0;
+  border-radius:50%;
+  background:rgba(200,148,58,.15);
+  border:1px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.6rem;
+  color:var(--gold);
+  font-weight:700;
+  font-family:'Syne',sans-serif;
+}
+
+.action-type { font-size:.58rem; letter-spacing:.1em; color:var(--gold); margin-bottom:2px; font-family:'JetBrains Mono',monospace; }
+.action-text { font-size:.76rem; color:var(--dim); line-height:1.5; }
+
+/* ─── BLOCKCHAIN ─── */
+.blockchain-card {
+  background:linear-gradient(135deg,rgba(106,180,216,.05),rgba(200,148,58,.04));
+  border:1px solid rgba(106,180,216,.18);
+}
+
+.hash-display {
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(106,180,216,.12);
+  border-radius:7px;
+  padding:10px 14px;
+  font-size:.66rem;
+  color:var(--sky);
+  word-break:break-all;
+  letter-spacing:.04em;
+  font-family:'JetBrains Mono',monospace;
+  margin-top:6px;
+  margin-bottom:10px;
+}
+
+.verify-btn {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:8px 16px;
+  border:1px solid rgba(106,180,216,.28);
+  border-radius:7px;
+  background:rgba(106,180,216,.07);
+  color:var(--sky);
+  font-size:.68rem;
+  letter-spacing:.07em;
+  cursor:pointer;
+  transition:all .2s;
+  text-decoration:none;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.verify-btn:hover { background:rgba(106,180,216,.14); border-color:var(--sky); }
+
+/* ─── QR CODE ─── */
+.qr-section {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  padding:20px;
+  background:var(--surface);
+  border:1px solid rgba(106,180,216,.15);
+  border-radius:10px;
+  margin-top:12px;
+}
+
+#qr-canvas {
+  border-radius:8px;
+  overflow:hidden;
+  background:white;
+  padding:8px;
+}
+
+.qr-label {
+  font-size:.6rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--dimmer);
+  font-family:'JetBrains Mono',monospace;
+  text-align:center;
+}
+
+/* ─── SHEETS SAVED ─── */
+.sheets-row {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.sheet-chip {
+  display:flex; align-items:center; gap:5px;
+  padding:5px 12px;
+  border:1px solid var(--rim);
+  border-radius:6px;
+  font-size:.62rem;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--dimmer);
+}
+
+.sheet-chip.saved { border-color:rgba(90,170,80,.3); color:var(--sprout); background:rgba(90,170,80,.05); }
+
+/* ─── VERIFICATION PAGE ─── */
+.verify-page-form {
+  max-width:520px;
+  margin:0 auto;
+}
+
+.verify-status-banner {
+  border-radius:14px;
+  padding:28px 32px;
+  margin-bottom:20px;
+  text-align:center;
+  display:none;
+}
+
+.verify-status-banner.verified {
+  background:linear-gradient(135deg,rgba(90,170,80,.12),rgba(90,170,80,.06));
+  border:1px solid rgba(90,170,80,.35);
+  display:block;
+}
+
+.verify-status-banner.tampered {
+  background:linear-gradient(135deg,rgba(224,82,82,.12),rgba(224,82,82,.06));
+  border:1px solid rgba(224,82,82,.35);
+  display:block;
+}
+
+.verify-status-badge {
+  font-family:'Syne',sans-serif;
+  font-size:2rem;
+  font-weight:800;
+  margin:8px 0;
+}
+
+.chain-visual {
+  display:flex;
+  align-items:center;
+  gap:0;
+  overflow-x:auto;
+  padding:16px 0;
+  margin-top:12px;
+}
+
+.chain-block {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  flex-shrink:0;
+}
+
+.chain-node {
+  width:64px; height:48px;
+  border-radius:8px;
+  border:1px solid var(--rim);
+  background:var(--surface);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column;
+  gap:2px;
+  font-size:.55rem;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--dimmer);
+}
+
+.chain-node.valid { border-color:rgba(90,170,80,.35); color:var(--sprout); background:rgba(90,170,80,.07); }
+.chain-node.invalid { border-color:rgba(224,82,82,.35); color:var(--alert); background:rgba(224,82,82,.07); }
+
+.chain-link {
+  width:20px; height:2px;
+  background:var(--rim);
+  flex-shrink:0;
+}
+
+.chain-link.valid { background:rgba(90,170,80,.35); }
+
+/* ─── RESET BTN ─── */
+.reset-btn {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:10px 20px;
+  border:1px solid rgba(200,148,58,.3);
+  border-radius:9px;
+  background:rgba(200,148,58,.07);
+  color:var(--amber);
+  font-family:'Syne',sans-serif;
+  font-size:.8rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+  margin-top:20px;
+}
+
+.reset-btn:hover { background:rgba(200,148,58,.14); border-color:var(--amber); }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--deep); }
+::-webkit-scrollbar-thumb { background:var(--rim); border-radius:3px; }
+
+/* ─── HERO ─── */
+.hero {
+  text-align:center;
+  padding:56px 24px 40px;
+}
+
+.hero-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 16px;
+  background:rgba(200,148,58,.1);
+  border:1px solid rgba(200,148,58,.25);
+  border-radius:30px;
+  font-size:.62rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:22px;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.hero h1 {
+  font-family:'Syne',sans-serif;
+  font-weight:800;
+  font-size:clamp(1.8rem,4vw,3.2rem);
+  letter-spacing:-.03em;
+  line-height:1.08;
+  margin-bottom:14px;
+}
+
+.hero h1 span {
+  background:linear-gradient(90deg,var(--gold),var(--amber),var(--sprout));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.hero p {
+  max-width:520px;
+  margin:0 auto 36px;
+  color:var(--dim);
+  font-size:.88rem;
+  line-height:1.75;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">🌾</div>
+    <div>
+      <div class="logo-name">FairTrade Intelligence</div>
+      <div class="logo-tag">BGS Hackathon · Blockchain Agri Platform</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-pill">
+      <div class="live-dot"></div>
+      N8N LIVE
+    </div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab active" data-page="trade">⚡ Trade Analysis</div>
+  <div class="nav-tab" data-page="verify">🔍 Verify QR</div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading">
+  <div class="loader-dots">
+    <div class="loader-dot"></div><div class="loader-dot"></div>
+    <div class="loader-dot"></div><div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+  </div>
+  <div class="loading-text">Running Intelligence Pipeline…</div>
+  <div class="loading-sub" id="loading-step">Validating inputs</div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE 1: TRADE ANALYSIS
+  ══════════════════════════════════════════════════ -->
+  <div class="page active" id="page-trade">
+
+    <div class="hero">
+      <div class="hero-badge">🛡️ Protecting Farmer Rights · Blockchain Verified</div>
+      <h1>Smart Trade <span>Intelligence</span></h1>
+      <p>Enter your Farmer ID and trade details — our AI pipeline auto-fills your data, checks pricing fairness, detects buyer fraud, and issues a blockchain certificate.</p>
+    </div>
+
+    <!-- INPUT FORM CARD -->
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">📋 Transaction Input</div>
+
+      <!-- FARMER ID + autofill -->
+      <div class="form-group full" style="margin-bottom:14px;">
+        <label>Farmer ID <span class="req">*</span></label>
+        <div style="display:flex;gap:10px;">
+          <input type="text" id="farmer_id" placeholder="e.g. F101" style="flex:1;">
+          <button class="verify-btn" style="padding:11px 18px;white-space:nowrap;" onclick="lookupFarmer()">🔎 Auto-Fill</button>
+        </div>
+        <div class="hint">Enter Farmer ID to auto-populate name, crop, and location from the dataset.</div>
+      </div>
+
+      <!-- Autofill display row -->
+      <div class="autofill-display" id="autofill-display">
+        <div class="autofill-field">
+          <div class="autofill-key">Name</div>
+          <div class="autofill-val" id="af-name">—</div>
+        </div>
+        <div class="autofill-field">
+          <div class="autofill-key">Crop</div>
+          <div class="autofill-val" id="af-crop">—</div>
+        </div>
+        <div class="autofill-field">
+          <div class="autofill-key">Location</div>
+          <div class="autofill-val" id="af-loc">—</div>
+        </div>
+        <div class="autofill-field">
+          <div class="autofill-key">Contact</div>
+          <div class="autofill-val" id="af-contact">—</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--rim);margin:18px 0;"></div>
+
+      <div class="form-grid">
+        <!-- Buyer Dropdown -->
+        <div class="form-group">
+          <label>Select Buyer <span class="req">*</span></label>
+          <div class="buyer-select-wrap">
+            <select id="buyer_id" onchange="onBuyerSelect()">
+              <option value="">— Choose a buyer —</option>
+              <option value="B001">B001 · Anil Kumar Traders</option>
+              <option value="B002">B002 · Ramesh Agro Exports</option>
+              <option value="B003">B003 · Sharma & Sons</option>
+              <option value="B004">B004 · Karnataka FPO Buyer</option>
+              <option value="B005">B005 · Metro Agri Hub</option>
+            </select>
+            <div class="buyer-reputation" id="buyer-rep">
+              <span id="buyer-rep-emoji" style="font-size:1rem">⭐</span>
+              <div class="rep-bar-wrap">
+                <div class="rep-bar-fill" id="buyer-rep-bar"></div>
+              </div>
+              <span class="rep-score-text" id="buyer-rep-text"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-group">
+          <label>Quantity (kg) <span class="req">*</span></label>
+          <input type="number" id="quantity_kg" placeholder="e.g. 500" min="1" oninput="updateTotal()">
+        </div>
+
+        <!-- Offered Price -->
+        <div class="form-group">
+          <label>Offered Price (₹/kg) <span class="req">*</span></label>
+          <input type="number" id="offered_price" placeholder="e.g. 18" step="0.5" oninput="updateTotal()">
+          <div class="hint">💡 Fair market price will be calculated automatically from live dataset.</div>
+        </div>
+
+        <!-- Total Preview -->
+        <div class="form-group">
+          <label>Total Value (Preview)</label>
+          <input type="text" id="total_preview" placeholder="—" readonly>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUP CREATION CARD -->
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">👥 Group Negotiation Mode</div>
+
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btn-individual" onclick="setMode('individual')">○ Individual Mode</button>
+        <button class="mode-btn" id="btn-group" onclick="setMode('group')">○ Group Mode</button>
+      </div>
+
+      <!-- Individual note -->
+      <div id="individual-note" style="font-size:.75rem;color:var(--dimmer);line-height:1.6;">
+        In individual mode, the system will automatically suggest nearby farmers growing the same crop for group bargaining opportunities.
+      </div>
+
+      <!-- Group Panel -->
+      <div class="group-panel" id="group-panel">
+        <input type="text" id="farmer-search" class="farmer-search-input" placeholder="Search by ID or name…" oninput="filterFarmerPool()">
+
+        <div class="farmer-pool" id="farmer-pool">
+          <!-- populated by JS -->
+        </div>
+
+        <!-- Selected group -->
+        <div class="selected-group-panel" id="selected-group-panel" style="display:none;">
+          <div class="selected-group-title">Selected Group Members</div>
+          <div class="selected-group-members" id="selected-members"></div>
+          <div class="group-stats">
+            <div class="group-stat">
+              <div class="group-stat-val" id="grp-size">1</div>
+              <div class="group-stat-key">Farmers</div>
+            </div>
+            <div class="group-stat">
+              <div class="group-stat-val" id="grp-qty">—</div>
+              <div class="group-stat-key">Est. Total Qty</div>
+            </div>
+            <div class="group-stat">
+              <div class="group-stat-val" id="grp-power">—</div>
+              <div class="group-stat-key">Bargaining Power</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <button class="submit-btn" id="submit-btn" onclick="submitTrade()">⚡ Run Intelligence Analysis</button>
+    <div class="error-box" id="error-box"></div>
+
+    <!-- ─── RESULTS PANEL ─── -->
+    <div id="result-panel">
+
+      <!-- Decision Banner -->
+      <div class="decision-banner" id="decision-banner">
+        <div class="decision-emoji" id="result-emoji">—</div>
+        <div style="flex:1;">
+          <div class="decision-verdict" id="result-verdict">—</div>
+          <div class="decision-headline" id="result-headline">—</div>
+          <div class="decision-tx" id="result-tx">—</div>
+          <div class="risk-row">
+            <div class="risk-label">Risk</div>
+            <div class="risk-track"><div class="risk-fill" id="risk-bar"></div></div>
+            <div class="risk-num" id="risk-num">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Farmer Info Card -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">🌾 Farmer Profile</div>
+        <div id="farmer-info-content"></div>
+      </div>
+
+      <!-- Result Grid -->
+      <div class="result-grid">
+        <!-- Price Intelligence -->
+        <div class="card">
+          <div class="card-title">💰 Price Intelligence</div>
+          <div class="price-bar-section" id="price-bars"></div>
+          <div id="price-rows"></div>
+        </div>
+
+        <!-- Fraud Detection -->
+        <div class="card">
+          <div class="card-title">🚨 Fraud Detection</div>
+          <div id="fraud-content"></div>
+        </div>
+
+        <!-- Buyer Intelligence -->
+        <div class="card">
+          <div class="card-title">👤 Buyer Intelligence</div>
+          <div id="buyer-content"></div>
+        </div>
+
+        <!-- Group Opportunity -->
+        <div class="card" style="background:linear-gradient(135deg,rgba(90,170,80,.06),rgba(74,124,69,.03));border-color:rgba(90,170,80,.2);">
+          <div class="card-title">👥 Group Opportunity</div>
+          <div id="group-content"></div>
+        </div>
+      </div>
+
+      <!-- Action Plan -->
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">📌 Recommended Action Plan</div>
+        <div class="action-list" id="action-list"></div>
+      </div>
+
+      <!-- Blockchain + QR -->
+      <div class="result-grid">
+        <div class="card blockchain-card">
+          <div class="card-title">🔗 Blockchain Certificate</div>
+          <div id="blockchain-content"></div>
+        </div>
+
+        <div class="card blockchain-card">
+          <div class="card-title">📱 QR Verification</div>
+          <div class="qr-section">
+            <div id="qr-canvas"></div>
+            <div class="qr-label">Scan to verify this trade on the blockchain ledger</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sheets Saved -->
+      <div class="card" style="margin-top:14px;">
+        <div class="card-title">📊 Google Sheets Saved</div>
+        <div class="sheets-row" id="sheets-row"></div>
+      </div>
+
+      <button class="reset-btn" onclick="resetForm()">↩ New Analysis</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE 2: VERIFY QR
+  ══════════════════════════════════════════════════ -->
+  <div class="page" id="page-verify">
+
+    <div class="hero">
+      <div class="hero-badge">🔍 Blockchain Tamper Detection</div>
+      <h1>Transaction <span>Verification</span></h1>
+      <p>Enter a transaction hash or ID from a QR code scan to verify the trade record is authentic and untampered on the blockchain ledger.</p>
+    </div>
+
+    <div class="verify-page-form">
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title">🔑 Verification Input</div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>Block Hash (from QR)</label>
+          <input type="text" id="verify-hash" placeholder="64-char hex hash…" style="font-family:'JetBrains Mono',monospace;font-size:.76rem;">
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label>Transaction ID</label>
+          <input type="text" id="verify-tx" placeholder="TX-... (optional if hash provided)">
+        </div>
+        <button class="submit-btn" onclick="verifyTransaction()">🔍 Verify on Ledger</button>
+        <div class="error-box" id="verify-error-box"></div>
+      </div>
+
+      <!-- Status Banner -->
+      <div class="verify-status-banner" id="verify-banner">
+        <div id="verify-emoji" style="font-size:2.5rem;margin-bottom:6px;">—</div>
+        <div class="verify-status-badge" id="verify-badge">—</div>
+        <div style="font-size:.82rem;color:var(--dim);margin-top:6px;" id="verify-message">—</div>
+      </div>
+
+      <!-- Details -->
+      <div class="card" id="verify-details-card" style="display:none;margin-bottom:14px;">
+        <div class="card-title">📄 Transaction Details</div>
+        <div id="verify-trade-rows"></div>
+      </div>
+
+      <div class="card blockchain-card" id="verify-chain-card" style="display:none;margin-bottom:14px;">
+        <div class="card-title">🔗 Blockchain Details</div>
+        <div id="verify-chain-rows"></div>
+        <div style="margin-top:14px;">
+          <div style="font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Chain History</div>
+          <div class="chain-visual" id="chain-visual"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════════
+const N8N_SUBMIT   = 'https://maya143.app.n8n.cloud/webhook/bgs/trade/submit';
+const N8N_VERIFY   = 'https://maya143.app.n8n.cloud/webhook/bgs/verify';
+
+// Buyer display data (for UX, actual risk comes from backend)
+const BUYER_DISPLAY = {
+  B001: { name:'Anil Kumar Traders',    rep:72, emoji:'✅' },
+  B002: { name:'Ramesh Agro Exports',   rep:38, emoji:'⚠️' },
+  B003: { name:'Sharma & Sons',         rep:55, emoji:'🔶' },
+  B004: { name:'Karnataka FPO Buyer',   rep:88, emoji:'✅' },
+  B005: { name:'Metro Agri Hub',        rep:20, emoji:'🚨' },
+};
+
+// Mock farmer pool for group selection UI
+const FARMER_POOL = [
+  { id:'F101', name:'Ramaiah G',     crop:'tomato',    loc:'Tumkur',   qty:1200 },
+  { id:'F102', name:'Lakshmi Bai',   crop:'onion',     loc:'Bellary',  qty:800  },
+  { id:'F103', name:'Suresh Kumar',  crop:'tomato',    loc:'Tumkur',   qty:1500 },
+  { id:'F104', name:'Priya Devi',    crop:'rice',      loc:'Mandya',   qty:2000 },
+  { id:'F105', name:'Manjunath S',   crop:'sugarcane', loc:'Hassan',   qty:5000 },
+  { id:'F106', name:'Veena Kumari',  crop:'tomato',    loc:'Kolar',    qty:900  },
+  { id:'F107', name:'Govinda Rao',   crop:'maize',     loc:'Dharwad',  qty:1800 },
+  { id:'F108', name:'Savitha MS',    crop:'groundnut', loc:'Raichur',  qty:700  },
+];
+
+let selectedGroupMembers = [];
+let currentMode = 'individual';
+
+// ── TABS ──────────────────────────────────────────
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('page-' + tab.dataset.page).classList.add('active');
+  });
+});
+
+// ── FARMER AUTOFILL ───────────────────────────────
+async function lookupFarmer() {
+  const fid = document.getElementById('farmer_id').value.trim();
+  if (!fid) return;
+  const f = FARMER_POOL.find(x => x.id === fid);
+  if (f) {
+    showAutofill(f.name, f.crop, f.loc, 'N/A');
+  } else {
+    showAutofill('Not in demo pool', '—', '—', '—');
+  }
+}
+
+function showAutofill(name, crop, loc, contact) {
+  document.getElementById('af-name').textContent    = name;
+  document.getElementById('af-crop').textContent    = crop;
+  document.getElementById('af-loc').textContent     = loc;
+  document.getElementById('af-contact').textContent = contact;
+  document.getElementById('autofill-display').classList.add('visible');
+}
+
+// ── BUYER SELECTION ───────────────────────────────
+function onBuyerSelect() {
+  const id = document.getElementById('buyer_id').value;
+  const repEl = document.getElementById('buyer-rep');
+  if (!id || !BUYER_DISPLAY[id]) { repEl.classList.remove('visible'); return; }
+  const b = BUYER_DISPLAY[id];
+  const color = b.rep >= 70 ? '#5aaa50' : b.rep >= 40 ? '#e08040' : '#e05252';
+  document.getElementById('buyer-rep-bar').style.width = b.rep + '%';
+  document.getElementById('buyer-rep-bar').style.background = color;
+  document.getElementById('buyer-rep-text').textContent = b.emoji + ' ' + b.rep + '/100 reputation';
+  document.getElementById('buyer-rep-text').style.color = color;
+  repEl.classList.add('visible');
+}
+
+// ── TOTAL PREVIEW ─────────────────────────────────
+function updateTotal() {
+  const qty   = parseFloat(document.getElementById('quantity_kg').value)   || 0;
+  const price = parseFloat(document.getElementById('offered_price').value) || 0;
+  document.getElementById('total_preview').value = qty && price
+    ? '₹' + (qty * price).toLocaleString('en-IN', {maximumFractionDigits:2})
+    : '';
+}
+
+// ── MODE TOGGLE ───────────────────────────────────
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-individual').classList.toggle('active', mode === 'individual');
+  document.getElementById('btn-group').classList.toggle('active', mode === 'group');
+  document.getElementById('individual-note').style.display = mode === 'individual' ? 'block' : 'none';
+  document.getElementById('group-panel').classList.toggle('active', mode === 'group');
+  if (mode === 'group') renderFarmerPool();
+}
+
+function renderFarmerPool(filter='') {
+  const pool = FARMER_POOL.filter(f =>
+    !filter ||
+    f.id.toLowerCase().includes(filter.toLowerCase()) ||
+    f.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  document.getElementById('farmer-pool').innerHTML = pool.map(f => {
+    const isSelected = selectedGroupMembers.some(m => m.id === f.id);
+    return `
+      <div class="farmer-pool-item ${isSelected?'selected':''}" id="pool-item-${f.id}">
+        <div class="farmer-pool-info">
+          <span class="farmer-pool-id">${f.id}</span>
+          <div>
+            <div class="farmer-pool-name">${f.name}</div>
+            <div class="farmer-pool-meta">${f.crop} · ${f.loc} · ~${f.qty}kg</div>
+          </div>
+        </div>
+        <button class="add-btn ${isSelected?'remove':''}" onclick="toggleFarmer('${f.id}')">
+          ${isSelected ? '✕ Remove' : '+ Add'}
+        </button>
+      </div>`;
+  }).join('');
+}
+
+function filterFarmerPool() {
+  renderFarmerPool(document.getElementById('farmer-search').value);
+}
+
+function toggleFarmer(fid) {
+  const f = FARMER_POOL.find(x => x.id === fid);
+  const idx = selectedGroupMembers.findIndex(m => m.id === fid);
+  if (idx >= 0) selectedGroupMembers.splice(idx, 1);
+  else selectedGroupMembers.push(f);
+  renderFarmerPool(document.getElementById('farmer-search').value);
+  renderSelectedGroup();
+}
+
+function renderSelectedGroup() {
+  const panel = document.getElementById('selected-group-panel');
+  if (selectedGroupMembers.length === 0) { panel.style.display='none'; return; }
+  panel.style.display = 'block';
+
+  document.getElementById('selected-members').innerHTML = selectedGroupMembers.map(m => `
+    <div class="member-chip">
+      <span>${m.id} · ${m.name}</span>
+      <span class="chip-remove" onclick="toggleFarmer('${m.id}')">✕</span>
+    </div>`).join('');
+
+  const totalQty = selectedGroupMembers.reduce((s,m) => s + m.qty, 0);
+  const mainQty  = parseFloat(document.getElementById('quantity_kg').value) || 0;
+  const size     = selectedGroupMembers.length + 1;
+  const power    = Math.min(100, size*15 + (totalQty+mainQty>2000?20:0));
+  const label    = power>=70 ? '💪 STRONG' : power>=40 ? '👊 MODERATE' : '🤜 WEAK';
+
+  document.getElementById('grp-size').textContent = size;
+  document.getElementById('grp-qty').textContent  = (totalQty+mainQty).toLocaleString() + ' kg';
+  document.getElementById('grp-power').textContent= label;
+}
+
+// ── SUBMIT TRADE ──────────────────────────────────
+async function submitTrade() {
+  const farmerId   = document.getElementById('farmer_id').value.trim();
+  const buyerId    = document.getElementById('buyer_id').value;
+  const qty        = parseFloat(document.getElementById('quantity_kg').value);
+  const price      = parseFloat(document.getElementById('offered_price').value);
+
+  const errBox = document.getElementById('error-box');
+  errBox.classList.remove('show');
+
+  if (!farmerId || !buyerId || !qty || !price) {
+    errBox.textContent = '⚠️ Please fill in all required fields: Farmer ID, Buyer, Quantity, and Price.';
+    errBox.classList.add('show');
+    return;
+  }
+
+  const payload = {
+    farmer_id:               farmerId,
+    buyer_id:                buyerId,
+    quantity_kg:             qty,
+    offered_price_per_unit:  price,
+    buyer_name:              BUYER_DISPLAY[buyerId]?.name || '',
+    group_farmer_ids:        currentMode==='group' ? selectedGroupMembers.map(m=>m.id) : [],
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  document.getElementById('result-panel').style.display = 'none';
+
+  const overlay = document.getElementById('loading');
+  const stepEl  = document.getElementById('loading-step');
+  overlay.classList.add('active');
+
+  const steps = [
+    'Validating inputs…','Looking up farmer dataset…',
+    'Running price intelligence…','Checking fraud rules…',
+    'Analysing buyer DNA…','Computing group opportunity…',
+    'Writing blockchain ledger…','Building response…'
+  ];
+  let si = 0;
+  const stepTimer = setInterval(() => {
+    stepEl.textContent = steps[si++ % steps.length];
+  }, 700);
+
+  try {
+    const res  = await fetch(N8N_SUBMIT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    clearInterval(stepTimer);
+    overlay.classList.remove('active');
+    btn.disabled = false;
+    if (data.success && data.farmer_card) {
+      renderResults(data);
+    } else {
+      errBox.innerHTML = '⚠️ Workflow returned an unexpected response. Check n8n execution logs.';
+      errBox.classList.add('show');
+    }
+  } catch(e) {
+    clearInterval(stepTimer);
+    overlay.classList.remove('active');
+    btn.disabled = false;
+    errBox.innerHTML = `🚨 Connection error: Could not reach n8n webhook. Make sure the workflow is <strong>activated</strong>.<br><small style="opacity:.6">${e.message}</small>`;
+    errBox.classList.add('show');
+  }
+}
+
+// ── RENDER RESULTS ────────────────────────────────
+function renderResults(data) {
+  const fc = data.farmer_card;
+  const pa = fc.price_info;
+  const fd = fc.fraud_summary;
+  const ba = fc.buyer_info;
+  const gn = fc.group_opportunity;
+  const bc = data.blockchain_certificate;
+  const sheets = data.sheets_saved;
+  const farmer = data.farmer;
+
+  // Decision Banner
+  const banner = document.getElementById('decision-banner');
+  banner.className = 'decision-banner';
+  const cls = fc.decision.includes('ACCEPT') ? 'accept'
+    : fc.decision.includes('NEGOTIATE') ? 'negotiate' : 'reject';
+  banner.classList.add(cls);
+  document.getElementById('result-emoji').textContent    = fc.decision_emoji;
+  document.getElementById('result-verdict').textContent  = fc.decision.replace(/_/g,' ');
+  document.getElementById('result-headline').textContent = pa.money_impact;
+  document.getElementById('result-tx').textContent       = 'TX: ' + data.transaction_id + ' · ' + new Date(data.analyzed_at).toLocaleString('en-IN');
+
+  const risk = fc.risk_score || 0;
+  const riskColor = risk>=65 ? 'var(--alert)' : risk>=35 ? 'var(--warn)' : 'var(--leaf)';
+  document.getElementById('risk-bar').style.cssText = `width:${risk}%;background:${riskColor};`;
+  document.getElementById('risk-num').style.color   = riskColor;
+  document.getElementById('risk-num').textContent   = risk + '/100';
+
+  // Farmer Info
+  document.getElementById('farmer-info-content').innerHTML = `
+    <div class="metric-row"><span class="metric-key">Farmer ID</span><span class="metric-val">${farmer.id}</span></div>
+    <div class="metric-row"><span class="metric-key">Name</span><span class="metric-val">${farmer.name}</span></div>
+    <div class="metric-row"><span class="metric-key">Location</span><span class="metric-val">${farmer.location}</span></div>
+    <div class="metric-row"><span class="metric-key">Crop</span><span class="metric-val">${farmer.crop}</span></div>
+  `;
+
+  // Price
+  const offered = parseFloat((pa.offered||'0').replace(/[₹/kg]/g,''));
+  const fair    = parseFloat((pa.fair_market||'0').replace(/[₹/kg]/g,''));
+  const maxP    = Math.max(offered,fair)*1.1||1;
+  const oh      = Math.round((offered/maxP)*100);
+  const fh      = Math.round((fair/maxP)*100);
+  const pColor  = offered < fair*.9 ? 'var(--alert)' : offered < fair ? 'var(--warn)' : 'var(--leaf)';
+
+  document.getElementById('price-bars').innerHTML = `
+    <div class="price-bar-wrap">
+      <div class="price-bar-outer"><div class="price-bar-inner" style="height:${oh}%;background:${pColor};"></div></div>
+      <div class="price-bar-value" style="color:${pColor}">${pa.offered}</div>
+      <div class="price-bar-label">Offered</div>
+    </div>
+    <div class="price-bar-wrap">
+      <div class="price-bar-outer"><div class="price-bar-inner" style="height:${fh}%;background:var(--amber);"></div></div>
+      <div class="price-bar-value" style="color:var(--amber)">${pa.fair_market}</div>
+      <div class="price-bar-label">Fair Market</div>
+    </div>`;
+
+  document.getElementById('price-rows').innerHTML = `
+    <div class="metric-row"><span class="metric-key">Crop</span><span class="metric-val">${farmer.crop}</span></div>
+    <div class="metric-row"><span class="metric-key">Deviation</span><span class="metric-val" style="color:${pColor}">${pa.deviation}</span></div>
+    <div class="metric-row"><span class="metric-key">Status</span><span class="metric-val">${pa.status.replace(/_/g,' ')}</span></div>
+    <div class="metric-row"><span class="metric-key">Data Source</span><span class="metric-val" style="font-size:.7rem;color:var(--dimmer)">${pa.data_source||'APMC'}</span></div>`;
+
+  // Fraud
+  const fColor = fd.level==='HIGH_RISK'?'var(--alert)':fd.level==='MEDIUM_RISK'?'var(--warn)':fd.level==='LOW_RISK'?'var(--amber)':'var(--leaf)';
+  const flagsHtml = fd.flags&&fd.flags.length>0
+    ? '<div class="flag-list">'+fd.flags.map(f=>`<div class="flag-item"><span>🚩</span><span>${String(f).replace(/_/g,' ')}</span></div>`).join('')+'</div>'
+    : '<div class="flag-list"><div class="flag-item" style="border-color:rgba(90,170,80,.2);background:rgba(90,170,80,.04);"><span>✅</span><span>No suspicious flags detected</span></div></div>';
+
+  document.getElementById('fraud-content').innerHTML = `
+    <div class="metric-row"><span class="metric-key">Fraud Score</span><span class="metric-val" style="color:${fColor}">${fd.score}/100</span></div>
+    <div class="metric-row"><span class="metric-key">Risk Level</span><span class="metric-val" style="color:${fColor}">${fd.level.replace(/_/g,' ')}</span></div>
+    <div class="metric-row"><span class="metric-key">Rules Evaluated</span><span class="metric-val">${fd.rules_evaluated||'—'}</span></div>
+    <div style="margin-top:10px;font-size:.58rem;letter-spacing:.1em;color:var(--dimmer);text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:6px;">Based on FPO / Govt Guidelines</div>
+    ${flagsHtml}`;
+
+  // Buyer
+  const bColor = ba.risk_level==='HIGH_RISK_BUYER'?'var(--alert)':ba.risk_level==='MODERATE_RISK_BUYER'?'var(--warn)':ba.risk_level==='TRUSTED_BUYER'?'var(--leaf)':'var(--sky)';
+  document.getElementById('buyer-content').innerHTML = `
+    <div class="metric-row"><span class="metric-key">Buyer</span><span class="metric-val">${ba.name}</span></div>
+    <div class="metric-row"><span class="metric-key">Risk Level</span><span class="metric-val" style="color:${bColor}">${ba.risk_level.replace(/_/g,' ')}</span></div>
+    <div class="metric-row"><span class="metric-key">Reputation</span><span class="metric-val" style="color:${bColor}">${ba.reputation}/100</span></div>
+    ${ba.is_blacklisted?'<div class="metric-row"><span class="metric-key">FPO Status</span><span class="metric-val" style="color:var(--alert)">🚫 BLACKLISTED</span></div>':''}
+    <div style="margin-top:10px;padding:9px 13px;background:rgba(255,255,255,.03);border-radius:7px;font-size:.72rem;color:var(--dim);line-height:1.5;">${ba.warning}</div>`;
+
+  // Group
+  document.getElementById('group-content').innerHTML = gn.available
+    ? `<div class="metric-row"><span class="metric-key">Farmers Available</span><span class="metric-val" style="color:var(--sprout)">👥 ${gn.farmers}</span></div>
+       <div class="metric-row"><span class="metric-key">Bargaining Power</span><span class="metric-val">${gn.power||'—'}</span></div>
+       <div class="metric-row"><span class="metric-key">Best Market</span><span class="metric-val">${gn.best_market||'—'}</span></div>
+       <div style="margin-top:10px;padding:9px 13px;background:rgba(90,170,80,.07);border-radius:7px;font-size:.72rem;color:var(--sprout);line-height:1.5;">${gn.message}</div>`
+    : `<div style="color:var(--dimmer);font-size:.78rem;line-height:1.6;">${gn.message}</div>`;
+
+  // Action Plan
+  const actions = fc.action_plan || [];
+  document.getElementById('action-list').innerHTML = actions.length
+    ? actions.map((a,i)=>`
+        <div class="action-item">
+          <div class="action-num">${i+1}</div>
+          <div>
+            <div class="action-type">${a.action?a.action.replace(/_/g,' '):'ACTION'}</div>
+            <div class="action-text">${a.description}</div>
+          </div>
+        </div>`).join('')
+    : `<div class="action-item"><div class="action-num">✓</div><div><div class="action-type">RECOMMENDED</div><div class="action-text">Deal looks fair. You may proceed with this trade.</div></div></div>`;
+
+  // Blockchain
+  document.getElementById('blockchain-content').innerHTML = `
+    <div class="metric-row"><span class="metric-key">Block Number</span><span class="metric-val" style="color:var(--sky)">#${bc.block_number}</span></div>
+    <div class="metric-row"><span class="metric-key">Chain Integrity</span><span class="metric-val" style="color:var(--leaf)">✅ ${bc.chain_integrity}</span></div>
+    <div class="metric-row"><span class="metric-key">Flagged</span><span class="metric-val" style="color:${bc.is_flagged?'var(--alert)':'var(--leaf)'}">${bc.is_flagged?'🚨 YES':'✅ NO'}</span></div>
+    <div style="font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);margin-top:12px;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">SHA-256 Hash</div>
+    <div class="hash-display">${bc.block_hash}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a class="verify-btn" href="${bc.verification_url}" target="_blank">🔍 Verify on Ledger ↗</a>
+    </div>`;
+
+  // QR Code
+  const qrEl = document.getElementById('qr-canvas');
+  qrEl.innerHTML = '';
+  new QRCode(qrEl, {
+    text: bc.verification_url || window.location.href,
+    width:160, height:160,
+    colorDark:'#0b0f0a',
+    colorLight:'#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // Sheets saved
+  const sheetDefs = [
+    { key:'transaction_log',   icon:'📋', label:'Transaction Log' },
+    { key:'blockchain_chain',  icon:'🔗', label:'Blockchain Chain' },
+    { key:'fraud_alert',       icon:'🚨', label:'Fraud Alerts' },
+    { key:'group_negotiation', icon:'👥', label:'Group Negotiation' },
+  ];
+  document.getElementById('sheets-row').innerHTML = sheetDefs.map(s=>`
+    <div class="sheet-chip ${sheets[s.key]?'saved':''}">
+      ${s.icon} ${s.label} ${sheets[s.key]?'· ✓ Saved':'· Skipped'}
+    </div>`).join('');
+
+  document.getElementById('result-panel').style.display = 'block';
+  document.getElementById('result-panel').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── RESET ─────────────────────────────────────────
+function resetForm() {
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('error-box').classList.remove('show');
+  document.getElementById('autofill-display').classList.remove('visible');
+  document.getElementById('buyer-rep').classList.remove('visible');
+  selectedGroupMembers = [];
+  setMode('individual');
+  document.getElementById('farmer_id').value    = '';
+  document.getElementById('buyer_id').value     = '';
+  document.getElementById('quantity_kg').value  = '';
+  document.getElementById('offered_price').value= '';
+  document.getElementById('total_preview').value= '';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ── VERIFY ────────────────────────────────────────
+async function verifyTransaction() {
+  const hash = document.getElementById('verify-hash').value.trim();
+  const tx   = document.getElementById('verify-tx').value.trim();
+  const errEl = document.getElementById('verify-error-box');
+  errEl.classList.remove('show');
+
+  if (!hash && !tx) {
+    errEl.textContent = '⚠️ Please enter at least one: Block Hash or Transaction ID.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const overlay  = document.getElementById('loading');
+  const stepEl   = document.getElementById('loading-step');
+  overlay.classList.add('active');
+  stepEl.textContent = 'Fetching blockchain record…';
+
+  // Hide previous results
+  document.getElementById('verify-banner').className = 'verify-status-banner';
+  document.getElementById('verify-details-card').style.display  = 'none';
+  document.getElementById('verify-chain-card').style.display    = 'none';
+
+  try {
+    const params = new URLSearchParams();
+    if (hash) params.set('hash', hash);
+    if (tx)   params.set('tx', tx);
+
+    const res  = await fetch(N8N_VERIFY + '?' + params.toString());
+    const data = await res.json();
+
+    overlay.classList.remove('active');
+    renderVerification(data);
+  } catch(e) {
+    overlay.classList.remove('active');
+    errEl.innerHTML = `🚨 Could not reach verification endpoint. Make sure the workflow is activated.<br><small style="opacity:.6">${e.message}</small>`;
+    errEl.classList.add('show');
+  }
+}
+
+function renderVerification(data) {
+  const dc = data.display_card;
+  if (!dc) {
+    document.getElementById('verify-error-box').textContent = '⚠️ No data returned. Check your hash or transaction ID.';
+    document.getElementById('verify-error-box').classList.add('show');
+    return;
+  }
+
+  // Banner
+  const banner = document.getElementById('verify-banner');
+  const isVerified = data.verified;
+  banner.className = 'verify-status-banner ' + (isVerified ? 'verified' : 'tampered');
+  document.getElementById('verify-emoji').textContent   = dc.badge === 'VERIFIED' ? '✅' : '⚠️';
+  document.getElementById('verify-badge').textContent   = dc.badge;
+  document.getElementById('verify-badge').style.color   = isVerified ? 'var(--leaf)' : 'var(--alert)';
+  document.getElementById('verify-message').textContent = data.message;
+
+  // Trade details
+  const detailsCard = document.getElementById('verify-details-card');
+  detailsCard.style.display = 'block';
+  document.getElementById('verify-trade-rows').innerHTML = (dc.trade_details||[]).map(r=>`
+    <div class="metric-row"><span class="metric-key">${r.label}</span><span class="metric-val">${r.value}</span></div>`).join('');
+
+  // Blockchain details
+  const chainCard = document.getElementById('verify-chain-card');
+  chainCard.style.display = 'block';
+  document.getElementById('verify-chain-rows').innerHTML = (dc.blockchain_details||[]).map(r=>`
+    <div class="metric-row"><span class="metric-key">${r.label}</span><span class="metric-val">${r.value}</span></div>`).join('');
+
+  // Chain visual
+  const chainView = dc.chain_view || [];
+  const chainEl   = document.getElementById('chain-visual');
+  chainEl.innerHTML = chainView.map((b,i) => {
+    const isValid = b.status.includes('VALID');
+    const isLast  = i === chainView.length - 1;
+    return `
+      <div class="chain-block">
+        <div class="chain-node ${isValid?'valid':'invalid'}">
+          <span style="font-size:.7rem;">${b.block}</span>
+          <span style="font-size:.55rem;">${b.hash}</span>
+        </div>
+      </div>
+      ${!isLast ? `<div class="chain-link ${isValid?'valid':''}"></div>` : ''}`;
+  }).join('');
+}
+</script>
+</body>
+</html>
